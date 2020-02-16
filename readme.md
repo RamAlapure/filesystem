@@ -7,13 +7,13 @@ How you can use it:
 <dependency>
   <groupId>com.github.ramalapure</groupId>
   <artifactId>filesystem</artifactId>
-  <version>1.0</version>
+  <version>1.1</version>
 </dependency>
 ```
 
 **Gradle**
 ```
-implementation 'com.github.ramalapure:filesystem:1.0'
+implementation 'com.github.ramalapure:filesystem:1.1'
 ```
 
 Let's see the configuration and how to get the instance of file system.
