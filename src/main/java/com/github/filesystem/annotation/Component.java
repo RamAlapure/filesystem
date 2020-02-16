@@ -16,5 +16,8 @@ import java.lang.annotation.Target;
 @Target(ElementType.TYPE)
 public @interface Component {
 
-    public String value();
+    /**
+     * @return Returns the type of file system.
+     */
+    String value();
 }

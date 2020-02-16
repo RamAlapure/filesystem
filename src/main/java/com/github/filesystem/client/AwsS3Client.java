@@ -59,8 +59,8 @@ public class AwsS3Client extends FileSystem {
     /**
      * The method used for the file system configuration. It configure aws S3 client based on the s3 credentials.
      *
-     * @param config
-     * @return
+     * @param config - The file system configuration {@link Configuration}.
+     * @return Returns file system instnce for AWS S3.
      */
     public FileSystem configure(Configuration config) {
         log.info("Configuring the AWS S3 client.");
@@ -98,10 +98,13 @@ public class AwsS3Client extends FileSystem {
         S3Object fullObject = null;
         try {
             fullObject = s3client.getObject(new GetObjectRequest((String) properties.get(AppConstants.S3_BUCKET_NAME), filePath));
+            if (fullObject != null) {
+                return fullObject.getObjectContent();
+            }
         } catch (SdkClientException e) {
             ErrorUtil.fileSystemException(ExceptionConstants.STR_AWS_EXCEPTION, e);
         }
-        return fullObject.getObjectContent();
+        throw new FileSystemException(String.format("The file: %s does not exist on S3.", filePath));
     }
 
     /**
@@ -237,7 +240,7 @@ public class AwsS3Client extends FileSystem {
                     .withBucketName((String) config.getProperties().get(AppConstants.S3_BUCKET_NAME))
                     .withPrefix(directory);
             ListObjectsV2Result listOfObjects = s3client.listObjectsV2(req);
-            List<String> filesPath = listOfObjects.getObjectSummaries().stream().map(obj -> obj.getKey()).collect(Collectors.toList());
+            List<String> filesPath = listOfObjects.getObjectSummaries().stream().map(S3ObjectSummary::getKey).collect(Collectors.toList());
             log.info("Returning response after reading list of objects from S3 from given directory.");
             return filesPath;
         } catch (Exception e) {
@@ -249,12 +252,17 @@ public class AwsS3Client extends FileSystem {
     /**
      * This method can be used to get the list of bucket.
      *
-     * @return
+     * @return Returns the list of bucket.
      * @throws FileSystemException
      */
     public List<String> getListOfBuckets() throws FileSystemException {
         log.info("Received request to get the list of buckets from S3.");
-        return s3client.listBuckets().stream().map(Bucket::getName).collect(Collectors.toList());
+        try {
+            return s3client.listBuckets().stream().map(Bucket::getName).collect(Collectors.toList());
+        } catch (Exception e) {
+            ErrorUtil.fileSystemException(ExceptionConstants.STR_AWS_EXCEPTION, e);
+        }
+        return new ArrayList<>();
     }
 
     /**
@@ -287,40 +295,8 @@ public class AwsS3Client extends FileSystem {
         log.info("Received request to delete the bucket from S3.");
         if (s3client.doesBucketExistV2(bucketName)) {
             try {
-                log.info("Removing objects from bucket");
-                ObjectListing object_listing = s3client.listObjects(bucketName);
-                while (true) {
-                    for (Iterator<?> iterator =
-                         object_listing.getObjectSummaries().iterator();
-                         iterator.hasNext(); ) {
-                        S3ObjectSummary summary = (S3ObjectSummary) iterator.next();
-                        s3client.deleteObject(bucketName, summary.getKey());
-                    }
-                    // more object_listing to retrieve?
-                    if (object_listing.isTruncated()) {
-                        object_listing = s3client.listNextBatchOfObjects(object_listing);
-                    } else {
-                        break;
-                    }
-                }
-
-                log.info("Removing versions from bucket");
-                VersionListing version_listing = s3client.listVersions(
-                        new ListVersionsRequest().withBucketName(bucketName));
-                while (true) {
-                    for (Iterator<?> iterator =
-                         version_listing.getVersionSummaries().iterator();
-                         iterator.hasNext(); ) {
-                        S3VersionSummary vs = (S3VersionSummary) iterator.next();
-                        s3client.deleteVersion(bucketName, vs.getKey(), vs.getVersionId());
-                    }
-
-                    if (version_listing.isTruncated()) {
-                        version_listing = s3client.listNextBatchOfVersions(version_listing);
-                    } else {
-                        break;
-                    }
-                }
+                removeObjects(bucketName);
+                removeVersions(bucketName);
                 s3client.deleteBucket(bucketName);
                 log.info("Returning a response after deleting the bucket from S3.");
             } catch (Exception e) {
@@ -328,6 +304,52 @@ public class AwsS3Client extends FileSystem {
             }
         } else {
             ErrorUtil.fileSystemException(String.format("The bucket: %s does not exist on S3.", bucketName));
+        }
+    }
+
+    /**
+     * Remove objects from the bucket.
+     *
+     * @param bucketName - The bucket name
+     */
+    private void removeObjects(String bucketName) {
+        log.info("Removing objects from bucket");
+        ObjectListing objectListing = s3client.listObjects(bucketName);
+        while (true) {
+            for (Iterator<?> iterator = objectListing.getObjectSummaries().iterator();
+                 iterator.hasNext(); ) {
+                S3ObjectSummary summary = (S3ObjectSummary) iterator.next();
+                s3client.deleteObject(bucketName, summary.getKey());
+            }
+            // more objectListing to retrieve?
+            if (objectListing.isTruncated()) {
+                objectListing = s3client.listNextBatchOfObjects(objectListing);
+            } else {
+                break;
+            }
+        }
+    }
+
+    /**
+     * Remove version from the bucket.
+     *
+     * @param bucketName - The bucket name
+     */
+    private void removeVersions(String bucketName) {
+        log.info("Removing versions from bucket");
+        VersionListing versionListing = s3client.listVersions(new ListVersionsRequest().withBucketName(bucketName));
+        while (true) {
+            for (Iterator<?> iterator = versionListing.getVersionSummaries().iterator();
+                 iterator.hasNext(); ) {
+                S3VersionSummary vs = (S3VersionSummary) iterator.next();
+                s3client.deleteVersion(bucketName, vs.getKey(), vs.getVersionId());
+            }
+
+            if (versionListing.isTruncated()) {
+                versionListing = s3client.listNextBatchOfVersions(versionListing);
+            } else {
+                break;
+            }
         }
     }
 

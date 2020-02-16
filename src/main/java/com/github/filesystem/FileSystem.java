@@ -18,8 +18,8 @@ public abstract class FileSystem {
     /**
      * The method used for the file system configuration. It configure aws S3 client based on the s3 credentials.
      *
-     * @param config
-     * @return
+     * @param config - The file system configuration {@link Configuration}.
+     * @return Returns file system instance based on configuration provided.
      */
     public abstract FileSystem configure(Configuration config) throws FileSystemException;
 

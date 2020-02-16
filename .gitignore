@@ -9,5 +9,7 @@ bin
 .project
 .svn/
 out
-gradle
 test
+gradle-publish.properties
+pubkey.asc
+privkey.asc

@@ -1,5 +1,22 @@
-The library cab be used to perform file system operations, currently it support AWS S3 and SFTP.
-How you can use it, let's see the configuration and how to get the instance of file system.
+The library cab be used to perform file system operations, currently it support AWS S3 and SFTP related operations.
+
+How you can use it:
+
+**Maven**
+```
+<dependency>
+  <groupId>com.github.ramalapure</groupId>
+  <artifactId>filesystem</artifactId>
+  <version>1.0</version>
+</dependency>
+```
+
+**Gradle**
+```
+implementation 'com.github.ramalapure:filesystem:1.0'
+```
+
+Let's see the configuration and how to get the instance of file system.
 
 **for AWS S3 file system:**
 ```
@@ -26,13 +43,15 @@ FileSystem fileSystem = FileSystemFactory.getFileSystem(config);
 The AWS S3 file system supports following operations on bucket:
  1. Create new bucket
     ```
-    // As creating a bucket is not directly available in file system interface we need to get the actual instance of S3 client.
+    // As creating a bucket is not directly available in file system interface 
+    // we need to get the actual instance of S3 client.
     AwsS3Client client = (AwsS3Client) fileSystem;
     client.createBucket("REPLACE_WITH_BUCKET_NAME");
     ```
  2. Get list of buckets
     ```
-    // As list of buckets is not directly available in file system interface we need to get the actual instance of S3 client.
+    // As list of buckets is not directly available in file system interface 
+    // we need to get the actual instance of S3 client.
     AwsS3Client client = (AwsS3Client) fileSystem;
     List<String> listOfBuckets = client.getListOfBuckets();
     ```
@@ -70,7 +89,8 @@ The AWS S3 file system supports following operations on bucket:
     ```
  10. Delete the bucket with objects and versions
      ```
-     // As deleting a bucket is not directly available in file system interface we need to get the actual instance of S3 client.
+     // As deleting a bucket is not directly available in file system interface 
+     // we need to get the actual instance of S3 client.
      AwsS3Client client = (AwsS3Client) fileSystem;
      client.deleteBucket("BUCKET_NAME");
      ```

@@ -16,5 +16,8 @@ import java.lang.annotation.Target;
 @Target(ElementType.TYPE)
 public @interface ComponentScan {
 
-    public String value();
+    /**
+     * @return Returns the package metadata.
+     */
+    String value();
 }

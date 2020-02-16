@@ -1,11 +1,11 @@
-/**
- *
- */
 package com.github.filesystem.util;
 
 /**
- * @author ralapure
+ * This class to provide information on exceptions.
  *
+ * @author Ram Alapure
+ * @version 1.0
+ * @since 12/02/2020
  */
 public class ExceptionConstants {
 

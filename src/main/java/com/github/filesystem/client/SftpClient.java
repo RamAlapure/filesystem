@@ -39,8 +39,8 @@ public class SftpClient extends FileSystem {
     /**
      * The method used for the file system configuration. It configure sftp client based on the sftp credentials.
      *
-     * @param config
-     * @return
+     * @param config - The file system configuration {@link Configuration}.
+     * @return Returns file system instnce for SFTP.
      */
     public FileSystem configure(Configuration config) throws FileSystemException {
         log.info("Configuring the SFTP client.");
@@ -187,7 +187,7 @@ public class SftpClient extends FileSystem {
      */
     @Override
     public List<String> getListOfFiles(String directory) throws FileSystemException {
-        log.info("Received request to get the list of files in directory: " + directory);
+        log.info(String.format("Received request to get the list of files in directory: %s", directory));
         List<String> files = new ArrayList<>();
         try {
             Vector ls = sftpChannel.ls(directory);
@@ -198,7 +198,7 @@ public class SftpClient extends FileSystem {
         } catch (SftpException e) {
             ErrorUtil.fileSystemException(ExceptionConstants.STR_SFTP_EXCEPTION, e);
         }
-        log.info("Returning response with the list of files from directory: " + directory);
+        log.info(String.format("Returning response with the list of files from directory: %s", directory));
         return files;
     }
 

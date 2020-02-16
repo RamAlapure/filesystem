@@ -18,11 +18,22 @@ public final class ErrorUtil {
     private ErrorUtil() {
     }
 
+    /**
+     *
+     * @param message
+     * @param e
+     * @throws FileSystemException
+     */
     public static void fileSystemException(String message, Exception e) throws FileSystemException {
-        log.severe(message + "Cause: " + AppConstants.STR_BRACES + e.getCause());
+        log.severe(String.format("%sCause: %s%s", message, AppConstants.STR_BRACES, e.getCause()));
         throw new FileSystemException(message);
     }
 
+    /**
+     *
+     * @param message
+     * @throws FileSystemException
+     */
     public static void fileSystemException(String message) throws FileSystemException {
         log.severe(message);
         throw new FileSystemException(message);

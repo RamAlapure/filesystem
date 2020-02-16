@@ -5,7 +5,7 @@ import com.github.filesystem.exception.FileSystemException;
 import java.util.logging.Logger;
 
 /**
- * Useful utilities to validate dependencies
+ * Useful utilities to validate dependencies.
  *
  * @author Ram Alapure
  * @version 1.0
