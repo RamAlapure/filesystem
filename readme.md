@@ -2,6 +2,8 @@ The library cab be used to perform file system operations, currently it support 
 
 How you can use it:
 
+[![Maven Central](https://maven-badges.herokuapp.com/maven-central/com.github.ramalapure/filesystem/badge.svg)](https://maven-badges.herokuapp.com/maven-central/com.github.ramalapure/filesystem)
+
 **Maven**
 ```
 <dependency>
